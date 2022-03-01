@@ -2,7 +2,7 @@ from .src import Handler
 
 
 def main() -> None:
-    Handler.handler()
+    Handler().handler()
 
 
 if __name__ == "__main__":
