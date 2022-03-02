@@ -13,29 +13,14 @@ class XORDCrypto:
             sys.exit(1)
 
     @staticmethod
-    def converter(key: str, string: str) -> str:
-        output = ""
+    def convert(key: bytes, data: bytes) -> str:
+        key = bytearray(key)
+        data = bytearray(data)
         try:
-            for i in range(len(string)):
-                j = i % len(key)
-                output += chr(ord(string[i]) ^ ord(key[j]))
-            return output
+            for index, values in enumerate(data):
+                x = index % len(key)
+                data[index] = values ^ x
+            return data
         except Exception as e:
             print("Error in XORDCrypto.converter()\n>>>", e)
-            sys.exit(1)
-
-    def encrypt(self, key: str, string: str) -> bytes:
-        try:
-            output = self.converter(key, string)
-            return base64.b64encode(output.encode())
-        except Exception as e:
-            print("Error in XORDCrypto.encrypt()\n>>>", e)
-            sys.exit(1)
-
-    def decrypt(self, key: str, string: bytes) -> bytes:
-        try:
-            output = base64.b64decode(string).decode()
-            return self.converter(key, output).encode()
-        except Exception as e:
-            print("Error in XORDCrypto.encrypt()\n>>>", e)
             sys.exit(1)

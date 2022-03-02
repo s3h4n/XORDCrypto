@@ -18,7 +18,7 @@ class FileHelper:
         """
         try:
             with open(file_path, "rb") as file:
-                return file.read().decode()
+                return file.read()
         except Exception as e:
             print("Error in FileHelper.read_file()\n>>>", e)
             sys.exit(1)

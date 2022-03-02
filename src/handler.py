@@ -21,18 +21,19 @@ class Handler:
                 file_path = input("File to encrypt: ")
                 key = self.file.read_file(key_path)
                 data = self.file.read_file(file_path)
-                encrypted_data = self.xordc.encrypt(key, data)
+                encrypted_data = self.xordc.convert(key, data)
                 self.file.write_file(file_path, encrypted_data)
             elif option == "2":
                 key_path = input("Key file: ")
                 file_path = input("File to decrypt: ")
                 key = self.file.read_file(key_path)
                 data = self.file.read_file(file_path)
-                decrypted_data = self.xordc.decrypt(key, data)
+                decrypted_data = self.xordc.convert(key, data)
                 self.file.write_file(file_path, decrypted_data)
             elif option == "3":
-                key = self.xordc.generate_key(16)
-                self.file.write_file("key.txt", key)
+                key = self.xordc.generate_key(32)
+                print(f"Your key is `{key}`.\nSaved to the `key.key`.")
+                self.file.write_file("key.key", key)
             elif option == "4":
                 sys.exit()
             else:
