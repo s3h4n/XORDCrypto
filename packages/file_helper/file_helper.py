@@ -7,14 +7,14 @@ class FileHelper:
     """
 
     @staticmethod
-    def read_file(file_path: str) -> str:
+    def read_file(file_path: str) -> bytes:
         """
         read_file reads a file and returns its content as a bytes object.
 
         :param file_path: the path to the file.
         :type file_path: str
         :return: the content of the file.
-        :rtype: str
+        :rtype: bytes
         """
         try:
             with open(file_path, "rb") as file:
@@ -24,12 +24,12 @@ class FileHelper:
             sys.exit(1)
 
     @staticmethod
-    def write_file(file_path: str, data: str) -> None:
+    def write_file(file_path: str, data: bytes) -> None:
         """
         write_file writes data to a file.
 
         :param file_path: the path to the file.
-        :type file_path: str
+        :type file_path: bytes
         :param data: the data to write to the file.
         :type data: str
         """
