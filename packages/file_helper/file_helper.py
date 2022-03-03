@@ -29,9 +29,9 @@ class FileHelper:
         write_file writes data to a file.
 
         :param file_path: the path to the file.
-        :type file_path: bytes
+        :type file_path: str
         :param data: the data to write to the file.
-        :type data: str
+        :type data: bytes
         """
         try:
             with open(file_path, "wb") as file:
