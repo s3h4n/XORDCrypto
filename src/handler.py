@@ -1,9 +1,8 @@
+from PyQt5 import QtCore, QtGui, QtWidgets
 from ..packages import XORDCrypto
 from ..packages import FileHelper
 from subprocess import call
 import sys
-
-from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Handler(object):
@@ -14,6 +13,8 @@ class Handler(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(800, 600)
+
+        self.MainWindow = MainWindow
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -79,6 +80,7 @@ class Handler(object):
 
         self.actionNew_Key = QtWidgets.QAction(MainWindow)
         self.actionNew_Key.setObjectName("actionNew_Key")
+        self.actionNew_Key.triggered.connect(self.new_key_action)
 
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
@@ -98,7 +100,7 @@ class Handler(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "XORDCrypto"))
         self.load_key_btn.setText(_translate("MainWindow", "Load Key"))
         self.open_file_btn.setText(_translate("MainWindow", "Open File"))
         self.convert_btn.setText(_translate("MainWindow", "Convert"))
@@ -109,14 +111,45 @@ class Handler(object):
         self.actionAbout.setText(_translate("MainWindow", "About"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
 
+    def create_log(self, text: str):
+        self.output_console.append(f">>> {text}")
+
+    def new_key_action(self):
+        new_key = self.xordc.generate_key(32)
+        new_key_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self.MainWindow, "Save Key", "", "Key Files (*.key)"
+        )
+        if new_key_path:
+            self.file.write_file(new_key_path, new_key)
+            self.create_log(self.key)
+
     def load_key_action(self):
-        pass
+        self.key_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self.MainWindow, "Open a Key", "", "Key Files (*.key)"
+        )
+        if self.key_path:
+            self.key_path_display.setText(self.key_path)
+            self.key = self.file.read_file(self.key_path)
+            self.create_log("Key loaded.")
 
     def open_file_action(self):
-        pass
+        self.file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self.MainWindow, "Open a File", "", "All Files (*)"
+        )
+        if self.file_path:
+            self.file_path_display.setText(self.file_path)
+            self.data = self.file.read_file(self.file_path)
+            self.create_log("File loaded.")
 
     def save_file_action(self):
-        pass
+        output_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self.MainWindow, "Save Output", "", "All Files (*)"
+        )
+        if output_path:
+            self.file.write_file(output_path, self.output)
+            self.create_log(self.key)
 
     def convert_file_action(self):
-        pass
+        if self.data and self.key:
+            self.output = self.xordc.convert(self.key, self.data)
+            self.create_log("File has converted.")
