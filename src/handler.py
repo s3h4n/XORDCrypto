@@ -121,7 +121,7 @@ class Handler(object):
         )
         if new_key_path:
             self.file.write_file(new_key_path, new_key)
-            self.create_log(self.key)
+            self.create_log(f"Key saved in {new_key_path}")
 
     def load_key_action(self):
         self.key_path, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -147,7 +147,7 @@ class Handler(object):
         )
         if output_path:
             self.file.write_file(output_path, self.output)
-            self.create_log(self.key)
+            self.create_log(f"Output saved in {output_path}")
 
     def convert_file_action(self):
         if self.data and self.key:
