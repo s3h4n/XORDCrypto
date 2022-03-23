@@ -1,6 +1,5 @@
 from ..packages import XORDCrypto
 from ..packages import FileHelper
-from . import constants
 from subprocess import call
 import sys
 
@@ -8,6 +7,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Handler(object):
+    def __init__(self) -> None:
+        self.xordc = XORDCrypto()
+        self.file = FileHelper()
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(800, 600)
