@@ -1,1 +1,1 @@
-from .cli_handler import Handler
+from .handler import Handler
