@@ -2,6 +2,12 @@
 
 XORDCrypto is a simple python cli tool that can encrypt and decrypt files using XOR encryption.
 
+Only tested in Ubuntu/Pop os.
+
+## Screenshots 📷
+
+<img src="https://github.com/s3h4n/XORDCrypto/blob/7f78145f55b5f6df5b4ac0207176c8b319edf0b7/resources/screenshots/Screenshot%20from%202022-03-24%2011-23-53.png" alt="screenshot 01"/>
+
 ## Requirements ✔️
 
 PyQt5 library for GUI.
