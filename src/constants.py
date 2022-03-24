@@ -15,3 +15,12 @@ COLOR = {
     "bold": "\033[1m",
     "end": "\033[0m",
 }
+ABOUT = "\
+XORDCrypto is a simple python\
+\ntool that can encrypt and decrypt\
+\nfiles using XOR encryption.\
+\n\
+\nCreated by Sehan Weerasekara.\
+\n\
+\nhttps://github.com/s3h4n/XORDCrypto\
+\n"

@@ -1,7 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from ..packages import XORDCrypto
 from ..packages import FileHelper
-from subprocess import call
+from . import constants
+from datetime import datetime
 import sys
 
 
@@ -15,38 +16,57 @@ class Handler(object):
         MainWindow.setFixedSize(800, 600)
 
         self.MainWindow = MainWindow
+        self.icon = QtGui.QIcon()
+        self.icon.addPixmap(
+            QtGui.QPixmap("XORDCrypto/resources/KeyLow_Safety.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
+        MainWindow.setWindowIcon(self.icon)
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
+        # Following button will open up a file browser and let user to choose a key file.
         self.load_key_btn = QtWidgets.QPushButton(self.centralwidget)
         self.load_key_btn.setGeometry(QtCore.QRect(10, 20, 150, 40))
         self.load_key_btn.setObjectName("load_key_btn")
         self.load_key_btn.clicked.connect(self.load_key_action)
 
+        # Following button will open up a file browser and let user to select a file to encryption/decryption.
         self.open_file_btn = QtWidgets.QPushButton(self.centralwidget)
         self.open_file_btn.setGeometry(QtCore.QRect(10, 70, 150, 40))
         self.open_file_btn.setObjectName("open_file_btn")
+        self.open_file_btn.setEnabled(False)
         self.open_file_btn.clicked.connect(self.open_file_action)
 
+        # following button will encrypt/decrypt the given file.
         self.convert_btn = QtWidgets.QPushButton(self.centralwidget)
         self.convert_btn.setGeometry(QtCore.QRect(640, 500, 150, 40))
         self.convert_btn.setObjectName("convert_btn")
+        self.convert_btn.setCheckable(True)
+        self.convert_btn.setChecked(False)
+        self.convert_btn.setEnabled(False)
         self.convert_btn.clicked.connect(self.convert_file_action)
 
+        # Following button will open up a file browser and let user to save ecnrypted/decrypted file.
         self.save_file_btn = QtWidgets.QPushButton(self.centralwidget)
         self.save_file_btn.setGeometry(QtCore.QRect(480, 500, 150, 40))
         self.save_file_btn.setObjectName("save_file_btn")
+        self.save_file_btn.setEnabled(False)
         self.save_file_btn.clicked.connect(self.save_file_action)
 
+        # This will show the path of the key.
         self.key_path_display = QtWidgets.QTextBrowser(self.centralwidget)
         self.key_path_display.setGeometry(QtCore.QRect(170, 20, 620, 40))
         self.key_path_display.setObjectName("key_path_display")
 
+        # This will show the path of the file.
         self.file_path_display = QtWidgets.QTextBrowser(self.centralwidget)
         self.file_path_display.setGeometry(QtCore.QRect(170, 70, 620, 40))
         self.file_path_display.setObjectName("file_path_display")
 
+        # This will show the outputs of tasks.
         self.output_console = QtWidgets.QTextBrowser(self.centralwidget)
         self.output_console.setGeometry(QtCore.QRect(10, 150, 780, 330))
         font = QtGui.QFont()
@@ -84,9 +104,11 @@ class Handler(object):
 
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
+        self.actionAbout.triggered.connect(self.about_dialog)
 
         self.actionQuit = QtWidgets.QAction(MainWindow)
         self.actionQuit.setObjectName("actionQuit")
+        self.actionQuit.triggered.connect(self.quit_action)
 
         self.menuFile.addAction(self.actionNew_Key)
         self.menuFile.addSeparator()
@@ -111,10 +133,12 @@ class Handler(object):
         self.actionAbout.setText(_translate("MainWindow", "About"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
 
-    def create_log(self, text: str):
-        self.output_console.append(f">>> {text}")
+    def create_log(self, text: str) -> None:
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        self.output_console.append(f"[{current_time}] ➡️ {text}")
 
-    def new_key_action(self):
+    def new_key_action(self) -> None:
         new_key = self.xordc.generate_key(32)
         new_key_path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self.MainWindow, "Save Key", "", "Key Files (*.key)"
@@ -122,34 +146,82 @@ class Handler(object):
         if new_key_path:
             self.file.write_file(new_key_path, new_key)
             self.create_log(f"Key saved in {new_key_path}")
+        else:
+            self.create_log(f"Adding new key has aborted.")
 
-    def load_key_action(self):
+    def load_key_action(self) -> None:
         self.key_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.MainWindow, "Open a Key", "", "Key Files (*.key)"
         )
         if self.key_path:
+            self.open_file_btn.setEnabled(True)
             self.key_path_display.setText(self.key_path)
             self.key = self.file.read_file(self.key_path)
-            self.create_log("Key loaded.")
+            self.create_log("Key file has successfully loaded.")
+        else:
+            self.open_file_btn.setEnabled(False)
+            self.convert_btn.setEnabled(False)
+            self.save_file_btn.setEnabled(False)
+            self.key_path_display.setText("")
+            self.file_path_display.setText("")
+            self.create_log(f"Loading key file has failed.")
 
-    def open_file_action(self):
+    def open_file_action(self) -> None:
         self.file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.MainWindow, "Open a File", "", "All Files (*)"
         )
         if self.file_path:
+            self.convert_btn.setEnabled(True)
             self.file_path_display.setText(self.file_path)
             self.data = self.file.read_file(self.file_path)
-            self.create_log("File loaded.")
+            self.create_log("File has successfully loaded.")
+        else:
+            self.convert_btn.setEnabled(False)
+            self.save_file_btn.setEnabled(False)
+            self.file_path_display.setText("")
+            self.create_log(f"Loading File has failed.")
 
-    def save_file_action(self):
+    def convert_file_action(self) -> None:
+        if self.data and self.key:
+            self.output = self.xordc.convert(self.key, self.data)
+            if self.convert_btn.isChecked():
+                self.create_log("File has converted.")
+                self.save_file_btn.setEnabled(True)
+            else:
+                self.create_log("File has reversed to original state.")
+                self.save_file_btn.setEnabled(False)
+
+    def save_file_action(self) -> None:
         output_path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self.MainWindow, "Save Output", "", "All Files (*)"
         )
-        if output_path:
+        if self.output and output_path:
             self.file.write_file(output_path, self.output)
             self.create_log(f"Output saved in {output_path}")
+        else:
+            self.create_log(f"Saving output has aborted.")
 
-    def convert_file_action(self):
-        if self.data and self.key:
-            self.output = self.xordc.convert(self.key, self.data)
-            self.create_log("File has converted.")
+    def quit_action(self) -> None:
+        sys.exit()
+
+    def about_dialog(self):
+        about_dialog = QtWidgets.QMessageBox()
+        about_dialog.setWindowTitle("About")
+
+        self.icon = QtGui.QIcon()
+        self.icon.addPixmap(
+            QtGui.QPixmap("XORDCrypto/resources/KeyLow_Safety.png"),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off,
+        )
+        about_dialog.setIconPixmap(self.icon.pixmap(QtCore.QSize(180, 180)))
+
+        about_dialog.setText(
+            "\n<h3 style='font-family:Ubuntu,sans-serif;'>XORDCrypto</h3>"
+        )
+        about_dialog.setInformativeText(constants.ABOUT)
+
+        about_dialog.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        about_dialog.setDefaultButton(QtWidgets.QMessageBox.Ok)
+
+        about_dialog.exec_()
